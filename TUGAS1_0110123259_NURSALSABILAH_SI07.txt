@@ -1,0 +1,837 @@
+C:\xampp\mysql\bin>mysql -u root -p
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 326
+Server version: 10.4.32-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| crud_db            |
+| dbpos              |
+| dbtinggi           |
+| dbtoko             |
+| dbtoko_baru        |
+| information_schema |
+| mysql              |
+| performance_schema |
+| phpmyadmin         |
+| test               |
++--------------------+
+10 rows in set (0.002 sec)
+
+1.Membuat tabel dbpegawai
+MariaDB [(none)]> create database dbpegawai;
+Query OK, 1 row affected (0.001 sec)
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| crud_db            |
+| dbpegawai          |
+| dbpos              |
+| dbtinggi           |
+| dbtoko             |
+| dbtoko_baru        |
+| information_schema |
+| mysql              |
+| performance_schema |
+| phpmyadmin         |
+| test               |
++--------------------+
+11 rows in set (0.002 sec)
+
+2.Masuk kedalam dbpegawai
+MariaDB [(none)]> use dbpegawai;
+Database changed
+
+3. Membuat tabel divisi
+MariaDB [dbpegawai]> create table divisi (
+    -> id int primary key auto_increment,
+    -> nama varchar(30) not null unique);
+Query OK, 0 rows affected (0.044 sec)
+
+4.Mendesc divisi
+MariaDB [dbpegawai]> desc divisi;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| id    | int(11)     | NO   | PRI | NULL    | auto_increment |
+| nama  | varchar(30) | NO   | UNI | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+2 rows in set (0.026 sec)
+
+5.Membuat tabel jabatan
+MariaDB [dbpegawai]> create table jabatan (
+    -> id int primary key auto_increment,
+    -> nama varchar(30) not null unique);
+Query OK, 0 rows affected (0.046 sec)
+
+6.Mendesc tabel jabatan.
+MariaDB [dbpegawai]> desc jabatan;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| id    | int(11)     | NO   | PRI | NULL    | auto_increment |
+| nama  | varchar(30) | NO   | UNI | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+2 rows in set (0.021 sec)
+
+7.membuat tabel pagawai
+MariaDB [dbpegawai]> create table pegawai(
+    -> id int primary key auto_increment,
+    -> nip char(5) not null unique,
+    -> nama varchar(30) not null unique,
+    -> temp_lahir varchar(30) not null,
+    -> tgl_lahir date not null,
+    -> iddivisi int not null references divisi(id),
+    -> idjabatan int not null references jabatan(id),
+    -> alamat text
+    -> gender ENUM('Laki-Laki', 'Perempuan') NOT NULL
+    -> );
+Query OK, 0 rows affected (0.048 sec)
+MariaDB [dbpegawai]> desc pegawai;
++---------------+-------------+------+-----+---------+----------------+
+| Field         | Type        | Null | Key | Default | Extra          |
++---------------+-------------+------+-----+---------+----------------+
+| id            | int(11)     | NO   | PRI | NULL    | auto_increment |
+| nip           | char(5)     | NO   | UNI | NULL    |                |
+| nama          | varchar(30) | NO   | UNI | NULL    |                |
+| temp_lahir    | varchar(30) | NO   |     | NULL    |                |
+| tgl_lahir     | date        | NO   |     | NULL    |                |
+| iddivisi      | int(11)     | NO   |     | NULL    |                |
+| idjabatan     | int(11)     | NO   |     | NULL    |                |
+| alamat        | text        | YES  |     | NULL    |                |
+| gender        | varchar(10) | YES  |     | NULL    |                |
++---------------+-------------+------+-----+---------+----------------+
+
+9.Menampilkan semua tabel yang ada di dbpegawai
+MariaDB [dbpegawai]> show tables;
++---------------------+
+| Tables_in_dbpegawai |
++---------------------+
+| divisi              |
+| jabatan             |
+| pegawai             |
++---------------------+
+3 rows in set (0.001 sec)
+
+10.Mengimput data untuk divisi
+MariaDB [dbpegawai]> insert into divisi values
+    -> ('','SDM'),
+    -> ('','Keuangan'),
+    -> ('','Marketing'),
+    -> ('','IT');
+Query OK, 4 rows affected, 4 warnings (0.003 sec)
+Records: 4  Duplicates: 0  Warnings: 4
+
+11.Tampilkan seluruh data divisi
+MariaDB [dbpegawai]> select * from divisi;
++----+-----------+
+| id | nama      |
++----+-----------+
+|  4 | IT        |
+|  2 | Keuangan  |
+|  3 | Marketing |
+|  1 | SDM       |
++----+-----------+
+4 rows in set (0.000 sec)
+
+12.Input data jabatan => Direktur, Manajer, Asisten Manajer, Staff
+MariaDB [dbpegawai]> insert into jabatan values
+    -> ('','Direktur'),
+    -> ('','Manajer'),
+    -> ('','Asisten Manajer'),
+    -> ('','Staff');
+Query OK, 4 rows affected, 4 warnings (0.003 sec)
+Records: 4  Duplicates: 0  Warnings: 4
+
+13.Tampilkan seluruh data jabatan
+MariaDB [dbpegawai]> select * from jabatan;
++----+-----------------+
+| id | nama            |
++----+-----------------+
+|  3 | Asisten Manajer |
+|  1 | Direktur        |
+|  2 | Manajer         |
+|  4 | Staff           |
++----+-----------------+
+4 rows in set (0.001 sec)
+
+14.Input 20 orang pegawai ( 1 divisi 5 orang, untuk gender dan jabatan diacak)
+MariaDB [dbpegawai]> insert into pegawai values
+    -> ('','098765','Budi Santoso','Jakarta','1990-01-10',2,3,'jalan utama no.12,cirebon','laki-laki'),
+    -> ('','897643','Siti Rahayu','Kalimantan','1987-07-24',2,2,'jalan mekar sari no.78,Depok','perempuan'),
+    -> ('','218965','Joko Susanto','Bogor','1987-10-08',2,4,'jalan haji mukmin,cilegon','laki-laki'),
+    -> ('','458640','Dewi Kurniawati','Depok','1997-05-08',2,1,'jalan kenangan ,cilegon','perempuan'),
+    -> ('','984503','Agus Prasetyo','Depok','1997-04-21',1,1,'jalan imam bonjol ,Bogor','laki-laki'),
+    -> ('','876532','Rina Febrianti','Medan','1999-02-09',1,4,' jln.palopat pijorkoling ,Bogor','perempuan'),
+    -> ('','875670','Slamet Riyadi','Jakarta','1989-12-09',1,2,' jln.perintis kemerdekaan ,Bekasi','laki-laki'),
+    -> ('','230192','Cinta','Jakarta','1980-20-07',1,3,' jln.by pass ,Surabaya','perempuan'),
+    -> ('','230872','Hadi','Jakarta','1981-10-03',3,3,' jln.by pass ,Surabaya','laki-laki'),
+    -> ('','235462','Nugroho','Bekasi','1986-11-09',3,4,' jln.insaflah ,Bogor','laki-laki'),
+    -> ('','273692','Putra','Bekasi','1986-11-29',3,2,' jln.duniamay ,Medan',;'laki-laki'),
+    -> ('','145772','Aldi','Bekasi','1996-08-22',3,1,' jln.sakura ,Cirebon','laki-laki'),
+    -> ('','195772','Indri','bogor','1996-01-22',4,1,' jln.budi utomo ,yogyakarta','perempuan'),
+    -> ('','197374','Sulaiman','Depok','1998-08-22',4,3,' jln.lusuhkan ,Bandung','laki-laki'),
+    -> ('','197989','Puspitasari','Depok','1998-11-27',4,2,' jln.onde-onde ,Padang','perempuan'),
+    -> ('','197998','Yono','Depok','1978-10-17',4,4,' jln.pelitas ,Bandung','laki-laki'),
+    -> ('','478660','Ajeng','Depok','1997-05-08',2,1,'jalan cempaka ,cilegon','perempuan'),
+    -> ('','194389','Pusari','Bogor','1998-11-28',4,2,' jln.serasi ,depok','perempuan'),
+    -> ('','190772','syipa','bandung','1989-08-22',3,1,' jln.muuin ,Cirebon','perempuan'),
+    -> ('','201192','putri','Jakarta','2000-29-27',1,3,' jln.by pass ,Surabaya','perempuan');
+Query OK, 20 rows affected, 42 warnings (0.004 sec)
+Records: 20  Duplicates: 0  Warnings: 42
+
+15.Tampilkan seluruh data pegawai
+MariaDB [dbpegawai]> select * from pegawai;
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-----------+
+| id | nip   | nama            | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | gender	|
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-----------+
+|  1 | 09876 | Budi Santoso    | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |laki-laki	|
+|  2 | 89764 | Siti Rahayu     | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok      |perempuan  |
+|  3 | 21896 | Joko Susanto    | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |laki-laki 	|
+|  4 | 45864 | Dewi Kurniawati | Depok      | 1997-05-08 |        2 |         1 | jalan kenangan ,cilegon           |perempuan  |
+|  5 | 98450 | Agus Prasetyo   | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor          |laki-laki	|
+|  6 | 87653 | Rina Febrianti  | Medan      | 1999-02-09 |        1 |         4 |  jln.palopat pijorkoling ,Bogor   |perempusn  |
+|  7 | 87567 | Slamet Riyadi   | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |laki-laki  |
+|  8 | 23019 | Cinta           | Jakarta    | 0000-00-00 |        1 |         3 |  jln.by pass ,Surabaya            |perempuan  |
+|  9 | 23087 | Hadi            | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |laki-laki  |
+| 10 | 23546 | Nugroho         | Bekasi     | 1986-11-09 |        3 |         4 |  jln.insaflah ,Bogor              |laki-laki  |
+| 11 | 27369 | Putra           | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan              |laki-laki  |
+| 12 | 14577 | Aldi            | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon              |laki=laki  |
+| 13 | 19577 | Indri           | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta       |perempuan  |
+| 14 | 19737 | Sulaiman        | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung            |laki-laki	|
+| 15 | 19798 | Puspitasari     | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang            |perempuan  |
+| 16 | 19799 | Yono            | Depok      | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung             |lai-laki	|
+| 17 | 47866 | Ajeng           | Depok      | 1997-05-08 |        2 |         1 | jalan cempaka ,cilegon            |perempuan  |
+| 18 | 19438 | Pusari          | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |perempuan  |
+| 19 | 19077 | syipa           | bandung    | 1989-08-22 |        3 |         1 |  jln.muuin ,Cirebon               |perempuan  |
+| 20 | 20119 | putri           | Jakarta    | 0000-00-00 |        1 |         3 |  jln.by pass ,Surabaya            |perempuan  |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-----------+
+20 rows in set (0.001 sec)
+
+16.Ubah data 5 orang pegawai (dengan ketentuan ubah 3 kolom(bebas))
+  1)MariaDB [dbpegawai]> update pegawai
+    ->  set nama = 'Agung',alamat ='jalan menuju kemenangan'
+    -> where id in (17);
+Query OK, 1 row affected (0.003 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+  2)MariaDB [dbpegawai]> update pegawai
+    ->  set nama = 'Ratu',temp_lahir ='Semarang'
+    -> where id in (16);
+Query OK, 1 row affected (0.003 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+  3)MariaDB [dbpegawai]> update pegawai
+    -> set nama='POLTAK'
+    -> where id in(18);
+Query OK, 1 row affected (0.003 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+  4)MariaDB [dbpegawai]> update pegawai
+    -> set tgl_lahir='2000-08-19'
+    -> where id in (19);
+Query OK, 1 row affected (0.003 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+ 5)MariaDB [dbpegawai]> update pegawai
+    ->  set nama = 'Lani',temp_lahir ='Sidoarjo'
+    -> where id in (20);
+Query OK, 1 row affected (0.003 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MariaDB [dbpegawai]> select * from pegawai;
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-----------+
+| id | nip   | nama            | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | gender	|
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-----------+
+|  1 | 09876 | Budi Santoso    | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |laki-laki	|
+|  2 | 89764 | Siti Rahayu     | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok      |perempuan  |
+|  3 | 21896 | Joko Susanto    | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |laki-laki 	|
+|  4 | 45864 | Dewi Kurniawati | Depok      | 1997-05-08 |        2 |         1 | jalan kenangan ,cilegon           |perempuan  |
+|  5 | 98450 | Agus Prasetyo   | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor          |laki-laki	|
+|  6 | 87653 | Rina Febrianti  | Medan      | 1999-02-09 |        1 |         4 |  jln.palopat pijorkoling ,Bogor   |perempusn  |
+|  7 | 87567 | Slamet Riyadi   | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |laki-laki  |
+|  8 | 23019 | Cinta           | Jakarta    | 0000-00-00 |        1 |         3 |  jln.by pass ,Surabaya            |perempuan  |
+|  9 | 23087 | Hadi            | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |laki-laki  |
+| 10 | 23546 | Nugroho         | Bekasi     | 1986-11-09 |        3 |         4 |  jln.insaflah ,Bogor              |laki-laki  |
+| 11 | 27369 | Putra           | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan              |laki-laki  |
+| 12 | 14577 | Aldi            | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon              |laki=laki  |
+| 13 | 19577 | Indri           | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta       |perempuan  |
+| 14 | 19737 | Sulaiman        | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung            |laki-laki	|
+| 15 | 19798 | Puspitasari     | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang            |perempuan  |
+| 16 | 19799 | Ratu            | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung             |lai-laki	|
+| 17 | 47866 | Agung           | Depok      | 1997-05-08 |        2 |         1 |  jalan menuju kemenangan          |perempuan  |
+| 18 | 19438 | POLTAK          | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |perempuan  |
+| 19 | 19077 | syipa           | bandung    | 2000-08-19 |        3 |         1 |  jln.muuin ,Cirebon               |perempuan  |
+| 20 | 20119 | Lani            | Sidoarjo   | 0000-00-00 |        1 |         3 |  jln.by pass ,Surabaya            |perempuan  |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-----------+
+
+17.Hapus 2 orang pegawai pegawai terakhir
+ 1)MariaDB [dbpegawai]> delete from pegawai where id =20;
+Query OK, 1 row affected (0.003 sec)
+
+ 2)MariaDB [dbpegawai]> delete from pegawai where id =19;
+Query OK, 1 row affected (0.003 sec)
+
+MariaDB [dbpegawai]> select * from pegawai;
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-----------+
+| id | nip   | nama            | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            |  gender    |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+------------+
+|  1 | 09876 | Budi Santoso    | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |Laki-Laki   |
+|  2 | 89764 | Siti Rahayu     | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok      |Perempuan   |
+|  3 | 21896 | Joko Susanto    | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |Laki-Laki   |
+|  4 | 45864 | Dewi Kurniawati | Depok      | 1997-05-08 |        2 |         1 | jalan kenangan ,cilegon           |Perempuan   |
+|  5 | 98450 | Agus Prasetyo   | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor          |Laki-Laki   |
+|  6 | 87653 | Rina Febrianti  | Medan      | 1999-02-09 |        1 |         4 |  jln.palopat pijorkoling ,Bogor   |Perempuan   |
+|  7 | 87567 | Slamet Riyadi   | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |Laki-Laki   |
+|  8 | 23019 | Cinta           | Jakarta    | 1996-08-31 |        1 |         3 |  jln.by pass ,Surabaya            |Perempuan   |
+|  9 | 23087 | Hadi            | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |Laki-Laki   |
+| 10 | 23546 | Nugroho         | Bekasi     | 1986-11-09 |        3 |         4 |  jln.insaflah ,Bogor              |Laki-Laki   |
+| 11 | 27369 | Putra           | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan              |Laki-Laki   |
+| 12 | 14577 | Aldi            | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon              |Laki-Laki   |
+| 13 | 19577 | Indri           | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta       |Perempuan   |
+| 14 | 19737 | Sulaiman        | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung            |Laki-Laki   |
+| 15 | 19798 | Puspitasari     | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang            |Perempuan   |
+| 16 | 19799 | Ratu            | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung             |Perempuan   |
+| 17 | 47866 | Agung           | Depok      | 1997-05-08 |        2 |         1 |  jalan menuju kemenangan          |Laki-Laki   |
+| 18 | 19438 | POLTAK          | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |Laki-Laki   |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+------------+ 
+
+
+
+
+18.Gunakan alter tabel pada tabel pegawai untuk menambahkan kolom baru berat_badan dengan
+tipe data float wajib diisi, lalu input berat badan semua pegawai secara acak
+
+MariaDB [dbpegawai]> alter table pegawai
+    -> add column berat_badan float not null;
+Query OK, 0 rows affected (0.010 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [dbpegawai]> select * from pegawai;
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-----------------------+
+| id | nip   | nama            | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | gender   | berat_badan|
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-----------------------+
+|  1 | 09876 | Budi Santoso    | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |Laki-Laki |         42 |
+|  2 | 89764 | Siti Rahayu     | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok      |Perempuan |         51 |
+|  3 | 21896 | Joko Susanto    | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |Laki-Laki |         87 |
+|  4 | 45864 | Dewi Kurniawati | Depok      | 1997-05-08 |        2 |         1 | jalan kenangan ,cilegon           |Perempuan |         41 |
+|  5 | 98450 | Agus Prasetyo   | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor          |Laki-Laki |         58 |
+|  6 | 87653 | Rina Febrianti  | Medan      | 1999-02-09 |        1 |         4 |  jln.palopat pijorkoling ,Bogor   |Perempuan |         74 |
+|  7 | 87567 | Slamet Riyadi   | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |Laki-Laki |         59 |
+|  8 | 23019 | Cinta           | Jakarta    | 1996-08-31 |        1 |         3 |  jln.by pass ,Surabaya            |Perempuan |         84 |
+|  9 | 23087 | Hadi            | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |Laki-Laki |         54 |
+| 10 | 23546 | Nugroho         | Bekasi     | 1986-11-09 |        3 |         4 |  jln.insaflah ,Bogor              |Laki-Laki |         79 |
+| 11 | 27369 | Putra           | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan              |Laki-Laki |         44 |
+| 12 | 14577 | Aldi            | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon              |Laki-Laki |         41 |
+| 13 | 19577 | Indri           | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta       |Perempuan |         85 |
+| 14 | 19737 | Sulaiman        | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung            |Laki-Laki |         60 |
+| 15 | 19798 | Puspitasari     | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang            |Perempuan |         59 |
+| 16 | 19799 | Ratu            | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung             |Perempuan |         73 |
+| 17 | 47866 | Agung           | Depok      | 1997-05-08 |        2 |         1 |  jalan menuju kemenangan          |Laki-Laki |  	 51 |
+| 18 | 19438 | POLTAK          | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |Laki-Laki |         47 |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+----------+
+18 rows in set (0.001 sec
+
+
+19.Gunakan alter tabel pada tabel pegawai untuk menambahkan kolom baru umur dengan tipe data
+integer wajib diisi, lalu input umur semua pegawai secara acak
+
+MariaDB [dbpegawai]> alter tabel pegawai
+    -> add column umur int not null;
+Query OK, 0 rows affected (0.010 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [dbpegawai]>  update pegawai
+    -> set berat_badan =floor(rand()*50) + 40;
+Query OK, 18 rows affected (0.002 sec)
+Rows matched: 18  Changed: 18  Warnings: 0
+
+MariaDB [dbpegawai]> select * from pegawai;
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| id | nip   | nama            | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | berat_badan | umur | gender        |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+|  1 | 09876 | Budi Santoso    | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |          42 |   41 | Laki-Laki     |
+|  2 | 89764 | Siti Rahayu     | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok      |          51 |   49 | Perempuan     |
+|  3 | 21896 | Joko Susanto    | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |          87 |   50 | Laki-Laki     |
+|  4 | 45864 | Dewi Kurniawati | Depok      | 1997-05-08 |        2 |         1 | jalan kenangan ,cilegon           |          41 |   35 | Perempuan     |
+|  5 | 98450 | Agus Prasetyo   | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor          |          58 |   57 | Laki-Laki     |
+|  6 | 87653 | Rina Febrianti  | Medan      | 1999-02-09 |        1 |         4 |  jln.palopat pijorkoling ,Bogor   |          74 |   59 | Perempuan     |
+|  7 | 87567 | Slamet Riyadi   | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |          59 |   53 | Laki-Laki     |
+|  8 | 23019 | Cinta           | Jakarta    | 1996-08-31 |        1 |         3 |  jln.by pass ,Surabaya            |          84 |   22 | Perempuan     |
+|  9 | 23087 | Hadi            | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |          54 |   28 | Laki-Laki     |
+| 10 | 23546 | Nugroho         | Bekasi     | 1986-11-09 |        3 |         4 |  jln.insaflah ,Bogor              |          79 |   57 | Laki-Laki     |
+| 11 | 27369 | Putra           | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan              |          44 |   31 | Laki-Laki     |
+| 12 | 14577 | Aldi            | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon              |          41 |   65 | Laki-Laki     |
+| 13 | 19577 | Indri           | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta       |          85 |   62 | Perempuan     |
+| 14 | 19737 | Sulaiman        | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung            |          60 |   46 | Laki-Laki     |
+| 15 | 19798 | Puspitasari     | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang            |          59 |   24 | Perempuan     |
+| 16 | 19799 | Ratu            | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung             |          73 |   63 | Perempuan     |
+| 17 | 47866 | Agung           | Depok      | 1997-05-08 |        2 |         1 |  jalan menuju kemenangan          |          51 |   23 | Laki-Laki     |
+| 18 | 19438 | POLTAK          | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |          47 |   59 | Laki-Laki     |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+
+20.Gunakan alter tabel pada tabel pegawai untuk mengubah nama kolom gender menjadi
+jenis_kelamin
+
+
+MariaDB [dbpegawai]> ALTER TABLE pegawai
+    -> CHANGE COLUMN gender jenis_kelamin VARCHAR(10);
+Query OK, 18 rows affected (0.089 sec)
+Records: 18  Duplicates: 0  Warnings: 0
+
+
+MariaDB [dbpegawai]> select * from pegawai;
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| id | nip   | nama            | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | berat_badan | umur | jenis_kelamin |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+|  1 | 09876 | Budi Santoso    | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |          42 |   41 | Laki-Laki     |
+|  2 | 89764 | Siti Rahayu     | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok      |          51 |   49 | Perempuan     |
+|  3 | 21896 | Joko Susanto    | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |          87 |   50 | Laki-Laki     |
+|  4 | 45864 | Dewi Kurniawati | Depok      | 1997-05-08 |        2 |         1 | jalan kenangan ,cilegon           |          41 |   35 | Perempuan     |
+|  5 | 98450 | Agus Prasetyo   | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor          |          58 |   57 | Laki-Laki     |
+|  6 | 87653 | Rina Febrianti  | Medan      | 1999-02-09 |        1 |         4 |  jln.palopat pijorkoling ,Bogor   |          74 |   59 | Perempuan     |
+|  7 | 87567 | Slamet Riyadi   | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |          59 |   53 | Laki-Laki     |
+|  8 | 23019 | Cinta           | Jakarta    | 1996-08-31 |        1 |         3 |  jln.by pass ,Surabaya            |          84 |   22 | Perempuan     |
+|  9 | 23087 | Hadi            | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |          54 |   28 | Laki-Laki     |
+| 10 | 23546 | Nugroho         | Bekasi     | 1986-11-09 |        3 |         4 |  jln.insaflah ,Bogor              |          79 |   57 | Laki-Laki     |
+| 11 | 27369 | Putra           | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan              |          44 |   31 | Laki-Laki     |
+| 12 | 14577 | Aldi            | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon              |          41 |   65 | Laki-Laki     |
+| 13 | 19577 | Indri           | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta       |          85 |   62 | Perempuan     |
+| 14 | 19737 | Sulaiman        | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung            |          60 |   46 | Laki-Laki     |
+| 15 | 19798 | Puspitasari     | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang            |          59 |   24 | Perempuan     |
+| 16 | 19799 | Ratu            | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung             |          73 |   63 | Perempuan     |
+| 17 | 47866 | Agung           | Depok      | 1997-05-08 |        2 |         1 |  jalan menuju kemenangan          |          51 |   23 | Laki-Laki     |
+| 18 | 19438 | POLTAK          | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |          47 |   59 | Laki-Laki     |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+
+
+21.Tampilkan kolom2 tertentu di tabel pegawai (nip,nama,jenis_kelamin,alamat)
+MariaDB [dbpegawai]> SELECT nip, nama, jenis_kelamin, alamat
+    -> FROM pegawai;
++-------+-----------------+---------------+-----------------------------------+
+| nip   | nama            | jenis_kelamin | alamat                            |
++-------+-----------------+---------------+-----------------------------------+
+| 09876 | Budi Santoso    | Laki-Laki     | jalan utama no.12,cirebon         |
+| 89764 | Siti Rahayu     | Perempuan     | jalan mekar sari no.78,Depok      |
+| 21896 | Joko Susanto    | Laki-Laki     | jalan haji mukmin,cilegon         |
+| 45864 | Dewi Kurniawati | Perempuan     | jalan kenangan ,cilegon           |
+| 98450 | Agus Prasetyo   | Laki-Laki     | jalan imam bonjol ,Bogor          |
+| 87653 | Rina Febrianti  | Perempuan     |  jln.palopat pijorkoling ,Bogor   |
+| 87567 | Slamet Riyadi   | Laki-Laki     |  jln.perintis kemerdekaan ,Bekasi |
+| 23019 | Cinta           | Perempuan     |  jln.by pass ,Surabaya            |
+| 23087 | Hadi            | Laki-Laki     |  jln.by pass ,Surabaya            |
+| 23546 | Nugroho         | Laki-Laki     |  jln.insaflah ,Bogor              |
+| 27369 | Putra           | Laki-Laki     |  jln.duniamay ,Medan              |
+| 14577 | Aldi            | Laki-Laki     |  jln.sakura ,Cirebon              |
+| 19577 | Indri           | Perempuan     |  jln.budi utomo ,yogyakarta       |
+| 19737 | Sulaiman        | Laki-Laki     |  jln.lusuhkan ,Bandung            |
+| 19798 | Puspitasari     | Perempuan     |  jln.onde-onde ,Padang            |
+| 19799 | Ratu            | Perempuan     |  jln.pelitas ,Bandung             |
+| 47866 | Agung           | Laki-Laki     | jalan menuju kemenangan           |
+| 19438 | POLTAK          | Laki-Laki     |  jln.serasi ,depok                |
++-------+-----------------+---------------+-----------------------------------+
+18 rows in set (0.001 sec)
+
+22.Tampilkan baris2 tertentu di tabel pegawai (yang gendernya laki2 saja)
+MariaDB [dbpegawai]> select * from pegawai
+    -> where jenis_kelamin='laki-laki';
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| id | nip   | nama          | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | berat_badan | umur | jenis_kelamin |
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+|  1 | 09876 | Budi Santoso  | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |          42 |   41 | Laki-Laki     |
+|  3 | 21896 | Joko Susanto  | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |          87 |   50 | Laki-Laki     |
+|  5 | 98450 | Agus Prasetyo | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor          |          58 |   57 | Laki-Laki     |
+|  7 | 87567 | Slamet Riyadi | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |          59 |   53 | Laki-Laki     |
+|  9 | 23087 | Hadi          | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |          54 |   28 | Laki-Laki     |
+| 10 | 23546 | Nugroho       | Bekasi     | 1986-11-09 |        3 |         4 |  jln.insaflah ,Bogor              |          79 |   57 | Laki-Laki     |
+| 11 | 27369 | Putra         | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan              |          44 |   31 | Laki-Laki     |
+| 12 | 14577 | Aldi          | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon              |          41 |   65 | Laki-Laki     |
+| 14 | 19737 | Sulaiman      | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung            |          60 |   46 | Laki-Laki     |
+| 17 | 47866 | Agung         | Depok      | 1997-05-08 |        2 |         1 | jalan menuju kemenangan           |          51 |   23 | Laki-Laki     |
+| 18 | 19438 | POLTAK        | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |          47 |   59 | Laki-Laki     |
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+11 rows in set (0.001 sec)
+
+23.Tampilkan baris2 tertentu di tabel pegawai (yang bekerja di divisi IT dan gendernya perempuan)
+MariaDB [dbpegawai]> select *from pegawai
+    -> where iddivisi=4 AND jenis_kelamin='Perempuan';
++----+-------+-------------+------------+------------+----------+-----------+-----------------------------+-------------+------+---------------+
+| id | nip   | nama        | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                      | berat_badan | umur | jenis_kelamin |
++----+-------+-------------+------------+------------+----------+-----------+-----------------------------+-------------+------+---------------+
+| 13 | 19577 | Indri       | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta |          85 |   62 | Perempuan     |
+| 15 | 19798 | Puspitasari | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang      |          59 |   24 | Perempuan     |
+| 16 | 19799 | Ratu        | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung       |          73 |   63 | Perempuan     |
++----+-------+-------------+------------+------------+----------+-----------+-----------------------------+-------------+------+---------------+
+3 rows in set (0.001 sec)
+
+24.Tampilkan data pegawai yang umurnya di atas 30 tahun dan lahirnya di kota jakarta dengan
+klausa WHERE, AND 
+
+MariaDB [dbpegawai]> select * from pegawai
+    -> where umur >30 AND temp_lahir = 'jakarta';
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| id | nip   | nama          | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | berat_badan | umur | jenis_kelamin |
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+|  1 | 09876 | Budi Santoso  | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |          42 |   41 | Laki-Laki     |
+|  7 | 87567 | Slamet Riyadi | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |          59 |   53 | Laki-Laki     |
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+ 
+25.Tampilkan data pegawai yang bekerja pada divisi marketing, berumur lebih dari 30 tahun dan
+berjenis kelamin perempuan dengan klausa WHERE, AND 
+
+
+MariaDB [dbpegawai]> select * from pegawai
+    -> where iddivisi = 3 AND umur >30 AND jenis_kelamin ='perempuan';
++----+-------+------+------------+------------+----------+-----------+----------------------+-------------+------+---------------+
+| id | nip   | nama | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat               | berat_badan | umur | jenis_kelamin |
++----+-------+------+------------+------------+----------+-----------+----------------------+-------------+------+---------------+
+| 11 | 27369 | nita | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan |          44 |   31 | perempuan     |
+| 12 | 14577 | siti | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon |          41 |   65 | perempuan     |
++----+-------+------+------------+------------+----------+-----------+----------------------+-------------+------+---------------+
+2 rows in set (0.001 sec)
+
+26.Tampilkan data pegawai dengan klausa key (nip)
+MariaDB [dbpegawai]> select * from pegawai
+    -> where nip =21896;
++----+-------+--------------+------------+------------+----------+-----------+---------------------------+-------------+------+---------------+
+| id | nip   | nama         | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                    | berat_badan | umur | jenis_kelamin |
++----+-------+--------------+------------+------------+----------+-----------+---------------------------+-------------+------+---------------+
+|  3 | 21896 | Joko Susanto | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon |          87 |   50 | Laki-Laki     |
++----+-------+--------------+------------+------------+----------+-----------+---------------------------+-------------+------+---------------+
+1 row in set (0.001 sec)
+
+27.Tampilkan data pegawai dengan klausa non key (gender)
+ 1) perempuan 
+MariaDB [dbpegawai]> select * from pegawai
+    -> where jenis_kelamin ='perempuan';
++----+-------+-----------------+------------+------------+----------+-----------+---------------------------------+-------------+------+---------------+
+| id | nip   | nama            | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                          | berat_badan | umur | jenis_kelamin |
++----+-------+-----------------+------------+------------+----------+-----------+---------------------------------+-------------+------+---------------+
+|  2 | 89764 | Siti Rahayu     | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok    |          51 |   49 | Perempuan     |
+|  4 | 45864 | Dewi Kurniawati | Depok      | 1997-05-08 |        2 |         1 | jalan kenangan ,cilegon         |          41 |   35 | Perempuan     |
+|  6 | 87653 | Rina Febrianti  | Medan      | 1999-02-09 |        1 |         4 |  jln.palopat pijorkoling ,Bogor |          74 |   59 | Perempuan     |
+|  8 | 23019 | Cinta           | Jakarta    | 1996-08-31 |        1 |         3 |  jln.by pass ,Surabaya          |          84 |   22 | Perempuan     |
+| 11 | 27369 | nita            | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan            |          44 |   31 | perempuan     |
+| 12 | 14577 | siti            | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon            |          41 |   65 | perempuan     |
+| 13 | 19577 | Indri           | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta     |          85 |   62 | Perempuan     |
+| 15 | 19798 | Puspitasari     | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang          |          59 |   24 | Perempuan     |
+| 16 | 19799 | Ratu            | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung           |          73 |   63 | Perempuan     |
++----+-------+-----------------+------------+------------+----------+-----------+---------------------------------+-------------+------+---------------+
+9 rows in set (0.001 sec)
+ 2) Laki-laki
+  
+MariaDB [dbpegawai]> select * from pegawai
+    -> where jenis_kelamin ='laki-laki';
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| id | nip   | nama          | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | berat_badan | umur | jenis_kelamin |
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+|  1 | 09876 | Budi Santoso  | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |          42 |   41 | Laki-Laki     |
+|  3 | 21896 | Joko Susanto  | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |          87 |   50 | Laki-Laki     |
+|  5 | 98450 | Agus Prasetyo | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor          |          58 |   57 | Laki-Laki     |
+|  7 | 87567 | Slamet Riyadi | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |          59 |   53 | Laki-Laki     |
+|  9 | 23087 | Hadi          | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |          54 |   28 | Laki-Laki     |
+| 10 | 23546 | Nugroho       | Bekasi     | 1986-11-09 |        3 |         4 |  jln.insaflah ,Bogor              |          79 |   57 | Laki-Laki     |
+| 14 | 19737 | Sulaiman      | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung            |          60 |   46 | Laki-Laki     |
+| 17 | 47866 | Agung         | Depok      | 1997-05-08 |        2 |         1 | jalan menuju kemenangan           |          51 |   23 | Laki-Laki     |
+| 18 | 19438 | POLTAK        | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |          47 |   59 | Laki-Laki     |
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+9 rows in set (0.001 sec)
+28.Tampilkan data pegawai dengan klausa in (menyebutkan beberapa nip)
+MariaDB [dbpegawai]> select nip from pegawai
+    -> where id =1;
++-------+
+| nip   |
++-------+
+| 09876 |
++-------+
+1 row in set (0.001 sec)
+
+29.Tampilkan data pegawai dengan klausa not in (menyebutkan beberapa tempat lahir)
+MariaDB [dbpegawai]> select * from pegawai
+    -> where temp_lahir NOT IN ('Bekasi','Depok','Medan');
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| id | nip   | nama          | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | berat_badan | umur | jenis_kelamin |
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+|  1 | 09876 | Budi Santoso  | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |          42 |   41 | Laki-Laki     |
+|  2 | 89764 | Siti Rahayu   | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok      |          51 |   49 | Perempuan     |
+|  3 | 21896 | Joko Susanto  | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |          87 |   50 | Laki-Laki     |
+|  7 | 87567 | Slamet Riyadi | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |          59 |   53 | Laki-Laki     |
+|  8 | 23019 | Cinta         | Jakarta    | 1996-08-31 |        1 |         3 |  jln.by pass ,Surabaya            |          84 |   22 | Perempuan     |
+|  9 | 23087 | Hadi          | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |          54 |   28 | Laki-Laki     |
+| 13 | 19577 | Indri         | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta       |          85 |   62 | Perempuan     |
+| 16 | 19799 | Ratu          | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung             |          73 |   63 | Perempuan     |
+| 18 | 19438 | POLTAK        | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |          47 |   59 | Laki-Laki     |
++----+-------+---------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+9 rows in set (0.001 sec)
+
+30.Menampilkan data pegawai dengan klausa Acesding
+MariaDB [dbpegawai]> select * from pegawai order by nama ASC;
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| id | nip   | nama            | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | berat_badan | umur | jenis_kelamin |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| 17 | 47866 | Agung           | Depok      | 1997-05-08 |        2 |         1 | jalan menuju kemenangan           |          51 |   23 | Laki-Laki     |
+|  5 | 98450 | Agus Prasetyo   | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor          |          58 |   57 | Laki-Laki     |
+|  1 | 09876 | Budi Santoso    | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |          42 |   41 | Laki-Laki     |
+|  8 | 23019 | Cinta           | Jakarta    | 1996-08-31 |        1 |         3 |  jln.by pass ,Surabaya            |          84 |   22 | Perempuan     |
+|  4 | 45864 | Dewi Kurniawati | Depok      | 1997-05-08 |        2 |         1 | jalan kenangan ,cilegon           |          41 |   35 | Perempuan     |
+|  9 | 23087 | Hadi            | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |          54 |   28 | Laki-Laki     |
+| 13 | 19577 | Indri           | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta       |          85 |   62 | Perempuan     |
+|  3 | 21896 | Joko Susanto    | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |          87 |   50 | Laki-Laki     |
+| 11 | 27369 | nita            | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan              |          44 |   31 | perempuan     |
+| 10 | 23546 | Nugroho         | Bekasi     | 1986-11-09 |        3 |         4 |  jln.insaflah ,Bogor              |          79 |   57 | Laki-Laki     |
+| 18 | 19438 | POLTAK          | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |          47 |   59 | Laki-Laki     |
+| 15 | 19798 | Puspitasari     | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang            |          59 |   24 | Perempuan     |
+| 16 | 19799 | Ratu            | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung             |          73 |   63 | Perempuan     |
+|  6 | 87653 | Rina Febrianti  | Medan      | 1999-02-09 |        1 |         4 |  jln.palopat pijorkoling ,Bogor   |          74 |   59 | Perempuan     |
+| 12 | 14577 | siti            | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon              |          41 |   65 | perempuan     |
+|  2 | 89764 | Siti Rahayu     | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok      |          51 |   49 | Perempuan     |
+|  7 | 87567 | Slamet Riyadi   | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |          59 |   53 | Laki-Laki     |
+| 14 | 19737 | Sulaiman        | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung            |          60 |   46 | Laki-Laki     |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+18 rows in set (0.001 sec)
+
+31.Tampilkan data pegawai dari yang berat badan paling gemuk ke paling kurus
+
+MariaDB [dbpegawai]> select * from pegawai order by berat_badan DESC;
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| id | nip   | nama            | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | berat_badan | umur | jenis_kelamin |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+|  3 | 21896 | Joko Susanto    | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |          87 |   50 | Laki-Laki     |
+| 13 | 19577 | Indri           | bogor      | 1996-01-22 |        4 |         1 |  jln.budi utomo ,yogyakarta       |          85 |   62 | Perempuan     |
+|  8 | 23019 | Cinta           | Jakarta    | 1996-08-31 |        1 |         3 |  jln.by pass ,Surabaya            |          84 |   22 | Perempuan     |
+| 10 | 23546 | Nugroho         | Bekasi     | 1986-11-09 |        3 |         4 |  jln.insaflah ,Bogor              |          79 |   57 | Laki-Laki     |
+|  6 | 87653 | Rina Febrianti  | Medan      | 1999-02-09 |        1 |         4 |  jln.palopat pijorkoling ,Bogor   |          74 |   59 | Perempuan     |
+| 16 | 19799 | Ratu            | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung             |          73 |   63 | Perempuan     |
+| 14 | 19737 | Sulaiman        | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung            |          60 |   46 | Laki-Laki     |
+|  7 | 87567 | Slamet Riyadi   | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |          59 |   53 | Laki-Laki     |
+| 15 | 19798 | Puspitasari     | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang            |          59 |   24 | Perempuan     |
+|  5 | 98450 | Agus Prasetyo   | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor          |          58 |   57 | Laki-Laki     |
+|  9 | 23087 | Hadi            | Jakarta    | 1981-10-03 |        3 |         3 |  jln.by pass ,Surabaya            |          54 |   28 | Laki-Laki     |
+|  2 | 89764 | Siti Rahayu     | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok      |          51 |   49 | Perempuan     |
+| 17 | 47866 | Agung           | Depok      | 1997-05-08 |        2 |         1 | jalan menuju kemenangan           |          51 |   23 | Laki-Laki     |
+| 18 | 19438 | POLTAK          | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok                |          47 |   59 | Laki-Laki     |
+| 11 | 27369 | nita            | Bekasi     | 1986-11-29 |        3 |         2 |  jln.duniamay ,Medan              |          44 |   31 | perempuan     |
+|  1 | 09876 | Budi Santoso    | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |          42 |   41 | Laki-Laki     |
+|  4 | 45864 | Dewi Kurniawati | Depok      | 1997-05-08 |        2 |         1 | jalan kenangan ,cilegon           |          41 |   35 | Perempuan     |
+| 12 | 14577 | siti            | Bekasi     | 1996-08-22 |        3 |         1 |  jln.sakura ,Cirebon              |          41 |   65 | perempuan     |
++----+-------+-----------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+18 rows in set (0.001 sec)
+
+32.Menampilkan data palig atas dengan limit 5 
+
+MariaDB [dbpegawai]> select * from pegawai
+    -> limit 5;
++----+-------+-----------------+------------+------------+----------+-----------+------------------------------+-------------+------+---------------+
+| id | nip   | nama            | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                       | berat_badan | umur | jenis_kelamin |
++----+-------+-----------------+------------+------------+----------+-----------+------------------------------+-------------+------+---------------+
+|  1 | 09876 | Budi Santoso    | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon    |          42 |   41 | Laki-Laki     |
+|  2 | 89764 | Siti Rahayu     | Kalimantan | 1987-07-24 |        2 |         2 | jalan mekar sari no.78,Depok |          51 |   49 | Perempuan     |
+|  3 | 21896 | Joko Susanto    | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon    |          87 |   50 | Laki-Laki     |
+|  4 | 45864 | Dewi Kurniawati | Depok      | 1997-05-08 |        2 |         1 | jalan kenangan ,cilegon      |          41 |   35 | Perempuan     |
+|  5 | 98450 | Agus Prasetyo   | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor     |          58 |   57 | Laki-Laki     |
++----+-------+-----------------+------------+------------+----------+-----------+------------------------------+-------------+------+---------------+
+5 rows in set (0.001 sec)
+
+33.Tampilkan data 5 pegawai terbawah gunakan klausa limit offset
+MariaDB [dbpegawai]> select * from pegawai
+    -> limit 5 offset 13;
++----+-------+-------------+------------+------------+----------+-----------+-------------------------+-------------+------+---------------+
+| id | nip   | nama        | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                  | berat_badan | umur | jenis_kelamin |
++----+-------+-------------+------------+------------+----------+-----------+-------------------------+-------------+------+---------------+
+| 14 | 19737 | Sulaiman    | Depok      | 1998-08-22 |        4 |         3 |  jln.lusuhkan ,Bandung  |          60 |   46 | Laki-Laki     |
+| 15 | 19798 | Puspitasari | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang  |          59 |   24 | Perempuan     |
+| 16 | 19799 | Ratu        | Semarang   | 1978-10-17 |        4 |         4 |  jln.pelitas ,Bandung   |          73 |   63 | Perempuan     |
+| 17 | 47866 | Agung       | Depok      | 1997-05-08 |        2 |         1 | jalan menuju kemenangan |          51 |   23 | Laki-Laki     |
+| 18 | 19438 | POLTAK      | Bogor      | 1998-11-28 |        4 |         2 |  jln.serasi ,depok      |          47 |   59 | Laki-Laki     |
++----+-------+-------------+------------+------------+----------+-----------+-------------------------+-------------+------+---------------+
+5 rows in set (0.001 sec)
+
+34.Tampilkan jumlah pegawai gunakan fungsi aggregrat count
+
+MariaDB [dbpegawai]> select count(*) as jumlah_pegawai
+    -> from  pegawai;
++----------------+
+| jumlah_pegawai |
++----------------+
+|             18 |
++----------------+
+1 row in set (0.005 sec)
+
+35.Tampilkan nip,nama pegawai, umur yg paling tua gunakan fungsi aggregrat max (kombinasi
+dengan sub query) 
+
+MariaDB [dbpegawai]> select nip,nama,umur
+    -> from pegawai
+    -> where umur =(
+    -> select MAX(umur)
+    -> from pegawai)
+    -> ;
++-------+------+------+
+| nip   | nama | umur |
++-------+------+------+
+| 14577 | siti |   65 |
++-------+------+------+
+1 row in set (0.002 sec)
+
+36.Tampilkan nip,nama pegawai, berat_badan yg paling kurus gunakan fungsi aggregrat min
+(kombinasi dengan sub query) 
+
+MariaDB [dbpegawai]> select nip,nama,berat_badan
+    -> from pegawai
+    -> where berat_badan =(
+    -> select MIN(berat_badan)
+    -> from pegawai);
++-------+-----------------+-------------+
+| nip   | nama            | berat_badan |
++-------+-----------------+-------------+
+| 45864 | Dewi Kurniawati |          41 |
+| 14577 | siti            |          41 |
++-------+-----------------+-------------+
+2 rows in set (0.001 sec)
+
+37.Tampilkan data rata2 umur pegawai gunakan fungsi aggregrat avg
+
+MariaDB [dbpegawai]> SELECT AVG(umur) AS rata_umur
+    -> FROM pegawai;
++-----------+
+| rata_umur |
++-----------+
+|   45.7778 |
++-----------+
+1 row in set (0.001 sec)
+
+38.Tampilkan jumlah data pegawai yang laki2 dan berumur lebih dari 40 tahun dan berjabatan
+Manajer, gunakan fungsi aggregrat count dan klausa AND 
+
+MariaDB [dbpegawai]> SELECT COUNT(*) AS jumlah_pegawai
+    -> FROM pegawai
+    -> WHERE jenis_kelamin = 'Laki-laki' AND umur > 40 AND idjabatan= 2;
++----------------+
+| jumlah_pegawai |
++----------------+
+|              2 |
++----------------+
+1 row in set (0.001 sec)
+
+39.Tampilkan jumlah data pegawai yang perempuan dan berumur kurang dari 40 tahun dan
+berjabatan Staff, gunakan fungsi aggregrat count dan klausa AND
+
+MariaDB [dbpegawai]> SELECT COUNT(*) AS jumlah_pegawai
+    -> FROM pegawai
+    -> WHERE jenis_kelamin = 'Perempuan' AND umur < 40 AND idjabatan= 4;
++----------------+
+| jumlah_pegawai |
++----------------+
+|              0 |
++----------------+
+1 row in set (0.001 sec)
+
+40.Tampilkan jumlah data pegawai yang perempuan gunakan fungsi aggregrat count
+
+MariaDB [dbpegawai]> SELECT COUNT(*) AS jumlah_pegawai_perempuan
+    -> FROM pegawai
+    -> WHERE jenis_kelamin = 'Perempuan';
++--------------------------+
+| jumlah_pegawai_perempuan |
++--------------------------+
+|                        9 |
++--------------------------+
+1 row in set (0.001 sec)
+
+41.Tampilkan jumlah pegawai yang bekerja di divisi SDM dengan fungsi aggregrat sum dan klausa
+WHERE 
+MariaDB [dbpegawai]> select sum(id) as total_pegawai
+    -> from pegawai where iddivisi=(1);
++---------------+
+| total_pegawai |
++---------------+
+|            26 |
++---------------+
+1 row in set (0.001 sec)
+
+42.Tampilkan jumlah pegawai berdasarkan divisi masing2 menggunakan fungsi aggregrat count
+dan klausa group by
+
+MariaDB [dbpegawai]> select iddivisi ,COUNT(*) AS jumlah_pegawai
+    -> from pegawai
+    -> group by iddivisi;
++----------+----------------+
+| iddivisi | jumlah_pegawai |
++----------+----------------+
+|        1 |              4 |
+|        2 |              5 |
+|        3 |              4 |
+|        4 |              5 |
++----------+----------------+
+4 rows in set (0.001 sec)
+
+43.Tampilkan data jumlah pegawai berdasarkan gender, yg jumlah minimal 10 orang (gunakan
+group by dan having)
+
+MariaDB [dbpegawai]>  SELECT jenis_kelamin, COUNT(*) AS jumlah_pegawai
+    -> FROM pegawai
+    -> GROUP BY jenis_kelamin
+    -> HAVING COUNT(*) >= 10;
++---------------+----------------+
+| jenis_kelamin | jumlah_pegawai |
++---------------+----------------+
+| perempuan     |             10 |
++---------------+----------------+
+1 row in set (0.001 sec)
+
+44.Cari data pegawai yang berawalan kata Muhammad
+
+MariaDB [dbpegawai]> select* from pegawai
+    -> where nama like 'Muhammad%';
++----+-------+------------------+------------+------------+----------+-----------+--------------------------+-------------+------+---------------+
+| id | nip   | nama             | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                   | berat_badan | umur | jenis_kelamin |
++----+-------+------------------+------------+------------+----------+-----------+--------------------------+-------------+------+---------------+
+|  5 | 98450 | Muhammad pratama | Depok      | 1997-04-21 |        1 |         1 | jalan imam bonjol ,Bogor |          58 |   57 | Laki-Laki     |
++----+-------+------------------+------------+------------+----------+-----------+--------------------------+-------------+------+---------------+
+1 row in set (0.001 sec)
+
+45.Cari data pegawai yang berakhiran kata Santoso 
+MariaDB [dbpegawai]> select* from pegawai
+    -> where nama like '%Santoso';
++----+-------+--------------+------------+------------+----------+-----------+---------------------------+-------------+------+---------------+
+| id | nip   | nama         | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                    | berat_badan | umur | jenis_kelamin |
++----+-------+--------------+------------+------------+----------+-----------+---------------------------+-------------+------+---------------+
+|  1 | 09876 | Budi Santoso | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon |          42 |   41 | perempuan     |
+|  3 | 21896 | Joko Santoso | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon |          87 |   50 | Laki-Laki     |
++----+-------+--------------+------------+------------+----------+-----------+---------------------------+-------------+------+---------------+
+2 rows in set (0.001 sec)
+
+46.Cari data pegawai yang mengadung kata Asep
+
+MariaDB [dbpegawai]> select* from pegawai
+    -> where nama like '%Asep%';
++----+-------+-------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| id | nip   | nama        | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | berat_badan | umur | jenis_kelamin |
++----+-------+-------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+|  7 | 87567 | Salmet Asep | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |          59 |   53 | Laki-Laki     |
++----+-------+-------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+1 row in set (0.001 sec)
+
+47.Cari data pegawai yang huruf kelimanya huruf S
+
+
+MariaDB [dbpegawai]> select * from pegawai
+    -> where nama like '%__s%';
++----+-------+--------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+| id | nip   | nama         | temp_lahir | tgl_lahir  | iddivisi | idjabatan | alamat                            | berat_badan | umur | jenis_kelamin |
++----+-------+--------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+|  1 | 09876 | Budi Santoso | Jakarta    | 1990-01-10 |        2 |         3 | jalan utama no.12,cirebon         |          42 |   41 | perempuan     |
+|  3 | 21896 | Joko Santoso | Bogor      | 1987-10-08 |        2 |         4 | jalan haji mukmin,cilegon         |          87 |   50 | Laki-Laki     |
+|  7 | 87567 | Salmet Asep  | Jakarta    | 1989-12-09 |        1 |         2 |  jln.perintis kemerdekaan ,Bekasi |          59 |   53 | Laki-Laki     |
+|  8 | 23019 | calasandra   | Jakarta    | 1996-08-31 |        1 |         3 |  jln.by pass ,Surabaya            |          84 |   22 | Perempuan     |
+| 15 | 19798 | Puspitasari  | Depok      | 1998-11-27 |        4 |         2 |  jln.onde-onde ,Padang            |          59 |   24 | Perempuan     |
++----+-------+--------------+------------+------------+----------+-----------+-----------------------------------+-------------+------+---------------+
+5 rows in set (0.001 sec)
